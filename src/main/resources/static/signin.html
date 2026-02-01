@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Storely - Signin</title>
+    <link rel="icon" type="image/x-icon" href="storely-logo-img.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body{ font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fcf9f8; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        label { display: block; font-size: 14px; font-weight: 600; color: #694d47; margin-bottom: 8px; }
+        input { width: 100%; padding: 12px 16px; border: 1px solid #e1cfcb; border-radius: 8px; font-size: 16px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; transition: all 0.25s; }
+        input:focus { outline: none; border-color: #fb4f49; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        h1 { font-size: 28px; font-weight: 700; color: #3b221e; margin: 0 0 8px 0; }
+        .success { font-size: 0.875rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .error { color: #d6211a; font-size: 0.875rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+
+        .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 20px; }
+        .lang-container { position: absolute; top: 20px; right: 20px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { background-color: white; width: 100%; max-width: 450px; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); text-align: center; }
+        .logo { width: 180px; height: auto; margin-bottom: 24px; }
+        .subtitle { font-size: 16px; color: #8b6864; margin-bottom: 32px; }
+        .form { text-align: left; margin-bottom: 20px; }
+
+        #signinBtn { width: 100%; color: white; background-color: #d6211a; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; cursor: pointer; margin-top: 24px; padding: 14px; transition: background 0.25s; }
+        #signinBtn:hover { background-color: #fb4f49; }
+        #loginBtn { border: none; background: none; color: #d6211a; font-weight: 600; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; cursor: pointer; padding: 0; text-decoration: underline; }
+        #langSelector { padding: 4px 8px; border-radius: 8px; background-color: #ecb2b2; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; border: none; outline: none; cursor: pointer; font-size: 15px; }
+    </style>
+    </head>
+    <body>
+        <div class="lang-container">
+            <label id="langLabel" style="display:inline; margin-right:5px;">Language:</label>
+            <select id="langSelector" onchange="changeLanguage()">
+                <option value="English">English</option>
+                <option value="Español">Español</option>
+            </select>
+        </div>
+        <div class="card">
+            <img src="storely-high-resolution-logo-transparent.png" class="logo" alt="Storely Logo">
+
+            <h1 id="signinHeader">Create your Account</h1>
+            <p class="subtitle" id="subText">Write your information below</p>
+
+            <div class="form">
+                <label id="userLabel">Create your Username</label>
+                <input type="text" id="userInput" placeholder="ex. John Smith">
+            </div>
+
+            <div class="form">
+                <label id="passLabel">Create your Master Password</label>
+                <input type="text" id="passwordInput" placeholder="Master Password">
+            </div>
+
+            <div class="form">
+                <label id="confirmLabel">Confirm your Password</label>
+                <input type="text" id="confirmInput" placeholder="Confirm Password" required>
+                <span id="passwordError" class="error"></span>
+            </div>
+
+            <div class="row">
+                <span id="account?Label">Already have an account?</span>
+                <button id="loginBtn" onclick="window.location.href='/index.html'">Log in</button>
+            </div>
+
+            <button id="signinBtn" onclick="handleSignin()">Sign in</button>
+        </div>
+    <script>
+        async function handleSignin() {
+            const username = document.getElementById("userInput").value;
+            const password = document.getElementById('passwordInput').value;
+            const confirm = document.getElementById('confirmInput').value
+            const statusText = document.getElementById('passwordError');
+            const lang = document.getElementById('langSelector').value;
+
+            let valid = true;
+
+            if (!username || !password || !confirm) {
+                alert(lang == "English" ? "Please fill in all fields." : "Porfavor escriba en todos los textos");
+                return;
+            }
+
+            if(password !== confirm) {
+                statusText.textContent = lang == "English" ? "Passwords dont' match" : "Contraseñas no coinciden";
+                statusText.classList.remove('success')
+                statusText.classList.add('error');
+                return;
+            }
+
+            const response = await fetch('/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({username: username, password: password})
+            });
+
+
+            if (response.ok) {
+                const user = await response.json();
+                alert(lang === "English" ? "Account created at name of " + user.username + " successfully!": "Cuenta creada a nombre de " + user.username + " con exito!");
+                localStorage.removeItem('currentUser');
+                localStorage.setItem('currentUser', user.id);
+                window.location.href = "/main.html"; // HTML Main Frame
+            } else {
+                const errorMsg = lang === "English" 
+                    ? "Username or Password don't match." 
+                    : "Nombre de Usuario o Contraseña incorrectos/as.";
+                alert(errorMsg); // HTML JOptionPane
+            }
+        }
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSelector').value;
+            const isSpan = lang === "Español";
+    
+            document.getElementById('signinHeader').innerText = isSpan ? "Cree su Cuenta" : "Create your Account";
+            document.getElementById('subText').innerText = isSpan ? "Escriba su informacion abajo" : "Write your information below";
+            document.getElementById('langLabel').innerText = isSpan ? "Idioma:" : "Language:";
+            document.getElementById('userLabel').innerText = isSpan ? "Cree su Nombre de Usuario" : "Create your User Name";
+            document.getElementById('passLabel').innerText = isSpan ? "Cree su Contraseña Maestra" : "Create your Master Password";
+            document.getElementById('confirmLabel').innerText = isSpan ? "Confirme su Contraseña Maestra" : "Confirm your Master Password";
+            document.getElementById('account?Label').innerText = isSpan ? "Ya tiene una cuenta?" : "Already have an account?";
+            document.getElementById('loginBtn').innerText = isSpan ? "Acceder" : "Log in";
+            document.getElementById('signinBtn').innerText = isSpan ? "Registrarse" : "Sign in";
+            document.getElementById('userInput').placeholder = isSpan ? "ex. John Smith" : "ej. John Smith";
+            document.getElementById('passwordInput').placeholder = isSpan ? "Contraseña Maestra" : "Master Password";
+            document.getElementById('confirmInput').placeholder = isSpan ? "Confirmar Contraseña " : "Confirm Password";
+        }
+    </script>
+    </body>
+</html>

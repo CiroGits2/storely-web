@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Storely - Main Table</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #3b221e; background-color: #fcf9f8; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .logo { width: 180px; max-width: 100%; height: auto; margin-top: 20px; margin-bottom: 20px; }
+        .card { background-color: white; height: 90%; width: 90%; max-width: 1500px; padding-top: 0; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; transition: background 0.25s; }
+        .sidebar { height: 100%; width: 15%; padding: 30px; background-color: #ecb2b2; display: flex; flex-direction: column; align-items: center; }
+        .main-content { flex: 1; padding: 33px; overflow-y: auto; }
+        .row { display: flex; justify-content: space-between; align-items: center; }
+        .addSearchRow { display: flex; align-items: center; width: 100%; }
+        input { width: 75%; padding: 12px 16px; margin-left: 10px; border: 1px solid #e1cfcb; border-radius: 8px; font-size: 16px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; transition: all 0.25s; }
+        input:focus { outline: none; border-color: #fb4f49; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .label { display: block; font-size: 16px; font-weight: 600; color: #694d47; margin-bottom: 8px; }
+        hr.solid { border: 0.25px solid #3b221e; border-radius: 8px; width: 100%; margin-bottom: 20px; margin-top: 20px; }
+        hr.twoSolid { border: 0.25px solid rgb(181, 178, 178); border-radius: 8px; width: 100%; margin-bottom: 20px; }
+        .spacer { flex-grow: 0.9; }
+        h1 { text-align: left; font-size: 28px; font-weight: 700; color: #3b221e; }
+        
+        /* Popup Styles */
+        .popupOverlay { display: none; position: fixed; top: 0; left: 0; justify-content: center; align-items: center; width: 100%; height: 100%; z-index: 1000; background-color: rgba(0,0,0,0.3); }
+        .popup { width: 400px; height: auto; background-color: white; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); border-radius: 14px; padding: 20px; text-align: center; }
+        
+        .lang-group { display: flex; align-items: center; justify-content: left; gap: 10px; }
+        .rowBtns { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
+        table { border-collapse: collapse; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); background-color: rgb(247, 245, 245); margin-top: 20px; width: 100%; }
+        tr:hover { background-color: #f2eeed; }
+        th { text-align: center; text-transform: uppercase; font-size: 16px; font-weight: 550; letter-spacing: 1.5px; color: #888; border-bottom: 2px solid #eee; padding: 12px; }
+        td { text-align: center; font-size: 16px; font-weight: 400; border-bottom: 1px solid #f0f0f0; padding: 16px 32px; }
+        
+        /* Buttons */
+        #yesBtn { color: white; background-color: #d6211a; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 25%; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px; transition: background 0.25s; }
+        #noBtn { color: white; background-color: #a3a3a3; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 25%; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px; transition: background 0.25s; }
+        #yesBtn:hover { background-color: #fb4f49; }
+        #noBtn:hover { background-color: #c0c0c0; }
+        #langSelector { padding: 4px 8px; border-radius: 8px; background-color: #ecb2b2; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; border: none; outline: none; cursor: pointer; font-size: 15px; }
+
+        #addPasswordBtn, #addContactBtn {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: auto; color: white; background-color: #d6211a; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; text-align: center; margin-right: 10px; padding: 14px; transition: background 0.25s; justify-content: right; }
+        #addPasswordBtn:hover, #addContactBtn:hover { background-color: #fb4f49; }
+        #searchWeb { flex-grow: 1; width: auto; margin-left: 15px }
+
+        #logoutBtn {width: 100%; border: none; background-color: #ecb2b2; border-radius: 8px; font-size: 18px; margin-bottom: 5px; font-weight: 400; letter-spacing: 0.25px; text-align: left; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; cursor: pointer; padding: 14px; transition: background 0.25s; }
+        #logoutBtn:hover{ background-color: #d6211a; color: white;}
+        /* Sidebar Buttons */
+        .sidebar-btn { width: 100%; border: none; background-color: transparent; border-radius: 8px; font-size: 18px; margin-bottom: 5px; font-weight: 400; letter-spacing: 0.25px; text-align: left; cursor: pointer; padding: 14px; transition: background 0.25s; color: #3b221e; }
+        .sidebar-btn:hover { background-color: rgba(214, 33, 26, 0.1); }
+        
+        /* THIS IS THE KEY TO FIXING YOUR COLOR ISSUE */
+        .sidebar-btn.active {
+            background-color: #d6211a !important;
+            color: white !important;
+        }
+
+        .deleteBtn, .editBtn { width: 100%; border: none; border-radius: 8px; background-color: #f8e8e4; padding: 8px; cursor: pointer; transition: background 0.25s; }
+        .deleteBtn:hover, .editBtn:hover { background-color: #d6211a; color: white; }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="sidebar">
+            <img src="storely-high-resolution-logo-transparent.png" class="logo" alt="Storely Logo">
+            <hr class="solid">
+
+            <button id="passwordBtn" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" class="sidebar-btn" onclick="showPasswords()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px; vertical-align: middle;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"></path></svg>
+                Passwords
+            </button>
+
+            <button id="contactBtn" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" class="sidebar-btn" onclick="showContacts()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px; vertical-align: middle;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="16" y2="14"></line></svg>
+                Contacts
+            </button>
+
+            <div class="spacer"></div>
+            <hr class="solid">
+
+            <button id="logoutBtn" class="sidebar-btn" onclick="logOut()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px; vertical-align: middle;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Log Out
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="lang-container">
+                <label id="langLabel" style="display:inline; margin-right:5px;">Language:</label>
+                <select id="langSelector" onchange="applyTranslations()">
+                    <option value="English">English</option>
+                    <option value="Español">Español</option>
+                </select>
+            </div>
+            <div class="row">
+                <h1 id="pageHeading">Your Passwords</h1>
+                <div class="addSearchRow">
+                    <button id="addPasswordBtn" onclick="window.location.href='/addPassword.html'">Add Password +</button>
+                    <button id="addContactBtn" onclick="window.location.href='/addContact.html'" style="display:none;">Add Contact +</button>
+                    <input type="text" id="searchWeb" placeholder="Search Website...">
+                </div>
+            </div>
+            <hr class="twoSolid">
+            <table id="table">
+                <thead>
+                    <tr>
+                        </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="popupOverlay" id="popupMessage">
+        <div class="popup">
+            <h2 id="popupTitle"></h2>
+            <div id="popupText"></div> <div class="rowBtns">
+                <button id="yesBtn">Yes</button>
+                <button id="noBtn" onclick="closeMessage()">No</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // 1. DICTIONARY: All your text lives here.
+    const dictionary = {
+        English: {
+            // Sidebar
+            passwords: "Passwords",
+            contacts: "Contacts",
+            logout: "Log Out",
+            // General UI
+            langLabel: "Language:",
+            passTitle: "Your Passwords",
+            contTitle: "Your Contacts",
+            addPass: "Add Password +",
+            addCont: "Add Contact +",
+            searchPass: "Search Website...",
+            searchCont: "Search Name...",
+            yes: "Yes",
+            no: "No",
+            // Popups
+            logoutMsg: "Are you sure you want to log out?",
+            deleteMsg: "Are you sure you want to delete this item permanently?",
+            edit: "Edit",
+            // Table Headers
+            thPass: ["ID Number", "Website", "Username", "Password", "Edit", "Delete"],
+            thCont: ["ID Number", "Name", "Email", "Phone Number", "Edit", "Delete"],
+            // Edit Labels
+            lblWebsite: "Website", lblUser: "Username", lblPass: "Password",
+            lblName: "Name", lblEmail: "Email", lblPhone: "Phone Number"
+        },
+        Español: {
+            // Sidebar
+            passwords: "Contraseñas",
+            contacts: "Contactos",
+            logout: "Cerrar Sesión",
+            // General UI
+            langLabel: "Idioma:",
+            passTitle: "Tus Contraseñas",
+            contTitle: "Tus Contactos",
+            addPass: "Añadir Contraseña +",
+            addCont: "Añadir Contacto +",
+            searchPass: "Buscar Sitio Web...",
+            searchCont: "Buscar Nombre...",
+            yes: "Sí",
+            no: "No",
+            // Popups
+            logoutMsg: "¿Estás seguro de que quieres cerrar sesión?",
+            deleteMsg: "¿Estás seguro de que quieres borrar esto permanentemente?",
+            edit: "Editar",
+            // Table Headers
+            thPass: ["Numero ID", "Sitio Web", "Usuario", "Contraseña", "Editar", "Borrar"],
+            thCont: ["Numero ID", "Nombre", "Correo Electronico", "Teléfono", "Editar", "Borrar"],
+            // Edit Labels
+            lblWebsite: "Sitio Web", lblUser: "Usuario", lblPass: "Contraseña",
+            lblName: "Nombre", lblEmail: "Correo Electronico", lblPhone: "Teléfono"
+        }
+    };
+
+    // 2. STATE MANAGEMENT
+    // We track the current view ('passwords' or 'contacts')
+    let currentView = 'passwords'; 
+
+    // 3. MAIN TRANSLATION FUNCTION
+    function applyTranslations() {
+        const lang = document.getElementById('langSelector').value;
+        const t = dictionary[lang];
+
+        // A. Update Sidebar Text (innerHTML preserves Icons)
+        updateSidebarBtn('passwordBtn', t.passwords);
+        updateSidebarBtn('contactBtn', t.contacts);
+        updateSidebarBtn('logoutBtn', t.logout);
+
+        // B. Update General Labels
+        document.getElementById('langLabel').innerText = t.langLabel;
+        document.getElementById('addPasswordBtn').innerText = t.addPass;
+        document.getElementById('addContactBtn').innerText = t.addCont;
+        document.getElementById('yesBtn').innerText = t.yes;
+        document.getElementById('noBtn').innerText = t.no;
+
+        // C. Update View Specifics (Title, Search, Table)
+        if (currentView === 'passwords') {
+            document.getElementById('pageHeading').innerText = t.passTitle;
+            document.getElementById('searchWeb').placeholder = t.searchPass;
+            renderTableHeaders(t.thPass);
+        } else {
+            document.getElementById('pageHeading').innerText = t.contTitle;
+            document.getElementById('searchWeb').placeholder = t.searchCont;
+            renderTableHeaders(t.thCont);
+        }
+    }
+
+    // Helper to keep SVG icon
+    function updateSidebarBtn(id, text) {
+        const btn = document.getElementById(id);
+        const svg = btn.querySelector('svg').outerHTML; // Keep the icon
+        btn.innerHTML = `${svg} ${text}`;
+    }
+
+    function renderTableHeaders(headersArray) {
+        const thead = document.querySelector("#table thead tr");
+    
+        thead.innerHTML = headersArray.map((h, index) => {
+            const isActionColumn = index >= headersArray.length - 2;
+
+            if (isActionColumn) {
+                return `<th>${h}</th>`;
+            } else {
+                return `
+                    <th onclick="sortTable(${index})" style="cursor:pointer; user-select:none;">
+                        <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                            ${h}
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M7 15l5 5 5-5M7 9l5-5 5 5"/>
+                            </svg>
+                        </div>
+                    </th>`;
+            }
+        }).join("");
+    }
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById("table");
+        const lang = document.getElementById('langSelector').value;
+        const t = dictionary[lang];
+    
+        const headers = currentView === 'passwords' ? t.thPass : t.thCont;
+        if (columnIndex >= headers.length - 2) return;
+
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+    
+        if (rows.length <= 1 && rows[0].cells.length === 1) return;
+
+        let direction = table.getAttribute("data-sort-dir") === "asc" ? "desc" : "asc";
+        table.setAttribute("data-sort-dir", direction);
+
+        const sortedRows = rows.sort((a, b) => {
+        const cellA = a.cells[columnIndex].innerText.trim();
+        const cellB = b.cells[columnIndex].innerText.trim();
+
+        const numA = parseFloat(cellA.replace(/[^\d.-]/g, ''));
+        const numB = parseFloat(cellB.replace(/[^\d.-]/g, ''));
+
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return direction === "asc" ? numA - numB : numB - numA;
+        }
+
+        return direction === "asc" 
+            ? cellA.localeCompare(cellB) 
+            : cellB.localeCompare(cellA);
+        });
+        tbody.innerHTML = "";
+        tbody.append(...sortedRows);
+    }
+
+    // 4. NAVIGATION FUNCTIONS
+    function showPasswords() {
+        currentView = 'passwords';
+        
+        // Toggle Buttons
+        document.getElementById("addContactBtn").style.display = 'none';
+        document.getElementById("addPasswordBtn").style.display = 'flex';
+        
+        // Set Active Color (Using CSS Class)
+        document.getElementById('passwordBtn').classList.add('active');
+        document.getElementById('contactBtn').classList.remove('active');
+
+        // Apply Text & Load Data
+        applyTranslations(); 
+        loadDataFromServer('passwords');
+    }
+
+    function showContacts() {
+        currentView = 'contacts';
+        
+        // Toggle Buttons
+        document.getElementById("addPasswordBtn").style.display = 'none';
+        document.getElementById("addContactBtn").style.display = 'flex';
+
+        // Set Active Color (Using CSS Class)
+        document.getElementById('passwordBtn').classList.remove('active');
+        document.getElementById('contactBtn').classList.add('active');
+
+        // Apply Text & Load Data
+        applyTranslations();
+        loadDataFromServer('contacts');
+    }
+
+    // 5. POPUP ACTIONS (Log Out, Delete, Edit)
+    function logOut() {
+        const lang = document.getElementById('langSelector').value;
+        const t = dictionary[lang];
+        
+        showPopupMessage(t.logout, t.logoutMsg, () => {
+            window.location.href = '/index.html';
+        });
+    }
+
+    async function deleteItem(type, id) {
+        const lang = document.getElementById('langSelector').value;
+        const t = dictionary[lang];
+
+        showPopupMessage("Delete", t.deleteMsg, async () => {
+            try {
+                // Determine endpoint based on type
+                await fetch(`/delete${type.charAt(0).toUpperCase() + type.slice(1)}/${id}`, { method: 'DELETE' });
+                loadDataFromServer(type); // Refresh table
+            } catch (exc) { console.error(exc); }
+        });
+    }
+
+    async function editItem(type, id) {
+        const userId = localStorage.getItem('currentUser');
+        const response = await fetch(`/${type}?userId=${userId}`);
+        const data = await response.json();
+        
+        // Find item
+        const item = data.find(i => (type === 'passwords' ? i.number : i.idNumber) === id);
+        if (!item) return;
+
+        // Get Translations
+        const lang = document.getElementById('langSelector').value;
+        const t = dictionary[lang];
+
+        let htmlContent = "";
+        
+        if (type === 'passwords') {
+            htmlContent = buildInputHtml(t.lblWebsite, item.website, "edit1") +
+                          buildInputHtml(t.lblUser, item.username, "edit2") +
+                          buildInputHtml(t.lblPass, item.encPassword, "edit3");
+        } else {
+            htmlContent = buildInputHtml(t.lblName, item.contactName, "edit1") +
+                          buildInputHtml(t.lblEmail, item.contactEmail, "edit2") +
+                          buildInputHtml(t.lblPhone, item.contactNumber, "edit3");
+        }
+
+        showPopupMessage(t.edit, htmlContent, async () => {
+            const v1 = document.getElementById('edit1').value;
+            const v2 = document.getElementById('edit2').value;
+            const v3 = document.getElementById('edit3').value;
+
+            const body = type === 'passwords' 
+                ? {website: v1, username: v2, password: v3} 
+                : {name: v1, email: v2, phone: v3};
+
+            await fetch(`/edit${type.charAt(0).toUpperCase() + type.slice(1)}/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            loadDataFromServer(type);
+        });
+    }
+
+    function buildInputHtml(label, value, id) {
+        return `
+            <div style="text-align:left; width:100%; margin-bottom:10px;">
+                <label style="font-weight:bold; font-size:14px;">${label}</label>
+                <input type="text" id="${id}" value="${value}" style="width:100%; padding:8px; margin-top:4px;">
+            </div>
+        `;
+    }
+
+    // 6. UTILITIES (Search, Load, Popup)
+    function showPopupMessage(title, content, yesAction) {
+        document.getElementById("popupMessage").style.display = "flex";
+        document.getElementById("popupTitle").innerText = title;
+        // Use innerHTML so inputs work
+        document.getElementById("popupText").innerHTML = content; 
+
+        document.getElementById("yesBtn").onclick = function() {
+            yesAction();
+            closeMessage();
+        };
+    }
+
+    function closeMessage() {
+        document.getElementById("popupMessage").style.display = 'none';
+    }
+
+    async function loadDataFromServer(type) {
+        try {
+            const tbody = document.querySelector("#table tbody");
+            const userId = localStorage.getItem('currentUser');
+            // Assuming your backend handles /passwords and /contacts
+            const response = await fetch(`/${type}?userId=${userId}`);
+            const data = await response.json(); 
+            tbody.innerHTML = "";
+
+            data.forEach(item => {
+                const tr = document.createElement("tr");
+                if (type === 'passwords') {
+                    tr.innerHTML = `
+                        <td>${item.number}</td><td>${item.website}</td><td>${item.username}</td><td>${item.encPassword}</td>
+                        <td><button class="editBtn" onclick="editItem('passwords', ${item.number})">${svgEdit()}</button></td>
+                        <td><button class="deleteBtn" onclick="deleteItem('passwords', ${item.number})">${svgDelete()}</button></td>`;
+                } else {
+                    tr.innerHTML = `
+                        <td>${item.idNumber}</td><td>${item.contactName}</td><td>${item.contactEmail}</td><td>${item.contactNumber}</td>
+                        <td><button class="editBtn" onclick="editItem('contacts', ${item.idNumber})">${svgEdit()}</button></td>
+                        <td><button class="deleteBtn" onclick="deleteItem('contacts', ${item.idNumber})">${svgDelete()}</button></td>`;
+                }
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error("Error loading data", error);
+        }
+    }
+
+    document.getElementById('searchWeb').addEventListener('keyup', function() {
+        const filter = this.value.toUpperCase();
+        const rows = document.getElementById('table').getElementsByTagName('tr');
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName("td");
+            let found = false;
+            for (let j = 0; j < cells.length; j++) {
+                if(cells[j].innerText.toUpperCase().indexOf(filter) > -1) found = true;
+            }
+            rows[i].style.display = found ? '' : 'none';
+        }
+    });
+
+    // SVG Helpers to keep code clean
+    const svgEdit = () => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+    const svgDelete = () => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
+    // INITIAL LOAD
+    window.onload = showPasswords;
+
+</script>
+</body>
+</html>
