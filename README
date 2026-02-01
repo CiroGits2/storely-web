@@ -1,0 +1,12 @@
+For anyone accessing this code, these are the important locations of the code that holds the website togther.
+
+    The "src" folder contains all the code that makes the app "alive", all of it being sotred in "main" (src/main)
+
+    The "storelyapp" folder (java/com/student/storelyapp) will contain all the Java files that manage the classes for the contacts, passwords, and users.
+    It also contains the backbend controllers that connect the SQL database data to the main UI, being distinguishable by the "Controller" text one each of the files.
+
+    The "resources" folder (src/resources) on the other hand, contains the "static" folder (src/resources/static) which stores 
+    the HTML/CSS/Javascript code that build the main web page from scracth. Each html file represent a single web page with its own function, 
+    text and format.
+
+This text has the purpose of explaining the structure of the app and how to distinguish it. You are welcome
