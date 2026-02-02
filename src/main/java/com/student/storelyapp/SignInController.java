@@ -28,9 +28,9 @@ public class SignInController {
 
     private User addUser(String username, String masterPassword) {
 
-        final String DB_URL = "jdbc:mysql://localhost:3306/PasswordManagerStore";
-        final String USERNAME = "root";
-        final String PASSWORD = "";
+        final String DB_URL = "jdbc:postgresql://" + System.getenv("PGHOST") + ":" + System.getenv("PGPORT") + "/" + System.getenv("PGDATABASE");
+        final String USERNAME = System.getenv("PGUSER");
+        final String PASSWORD = System.getenv("PGPASSWORD");
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
