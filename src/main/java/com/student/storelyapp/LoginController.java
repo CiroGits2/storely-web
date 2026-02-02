@@ -29,28 +29,28 @@ public class LoginController {
     
     private User authenticateUser(String username, String password) {
 
-    final String DB_URL = "jdbc:mysql://localhost:3306/PasswordManagerStore";
-    final String USERNAME = "root";
-    final String PASSWORD = "";
+        final String DB_URL = "jdbc:postgresql://" + System.getenv("PGHOST") + ":" + System.getenv("PGPORT") + "/" + System.getenv("PGDATABASE");
+        final String USERNAME = System.getenv("PGUSER");
+        final String PASSWORD = System.getenv("PGPASSWORD");
 
-    try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
-        String sql = "SELECT * FROM users WHERE username = ? AND masterPassword = ?";
+            String sql = "SELECT * FROM users WHERE username = ? AND masterPassword = ?";
 
-        PreparedStatement pStatement = conn.prepareStatement(sql);
+            PreparedStatement pStatement = conn.prepareStatement(sql);
 
-        pStatement.setString(1, username);
-        pStatement.setString(2, password);
-        ResultSet rs = pStatement.executeQuery();
+            pStatement.setString(1, username);
+            pStatement.setString(2, password);
+            ResultSet rs = pStatement.executeQuery();
 
-        if (rs.next()) {
-            User user = new User();
-            user.id = rs.getInt("id");
-            user.username = rs.getString("username");
-            user.masterPassword = rs.getString("masterPassword");
-            return user;
-        }
-    } catch (Exception e) { e.printStackTrace(); }
+            if (rs.next()) {
+                User user = new User();
+                user.id = rs.getInt("id");
+                user.username = rs.getString("username");
+                user.masterPassword = rs.getString("masterPassword");
+                return user;
+            }
+        } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
     
