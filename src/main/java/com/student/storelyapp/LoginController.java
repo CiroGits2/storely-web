@@ -35,7 +35,7 @@ public class LoginController {
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
-            String sql = "SELECT * FROM users WHERE username = ? AND masterPassword = ?";
+            String sql = "SELECT * FROM Users WHERE username = ? AND masterPassword = ?";
 
             PreparedStatement pStatement = conn.prepareStatement(sql);
 
