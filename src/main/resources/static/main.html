@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Storely - Main Table</title>
-    <link rel="icon" type="image/x-icon" href="storely-logo-img.png">
+    <link rel="icon" type="image/x-icon" href="storely-logo-img-favicon.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,7 @@
         tr:hover { background-color: #f2eeed; }
         th { text-align: center; text-transform: uppercase; font-size: 16px; font-weight: 550; letter-spacing: 1.5px; color: #888; border-bottom: 2px solid #eee; padding: 12px; }
         td { text-align: center; font-size: 16px; font-weight: 400; border-bottom: 1px solid #f0f0f0; padding: 16px 32px; }
-        
+
         /* Buttons */
         #yesBtn { color: white; background-color: #d6211a; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 25%; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px; transition: background 0.25s; }
         #noBtn { color: white; background-color: #a3a3a3; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 25%; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px; transition: background 0.25s; }
@@ -51,15 +51,12 @@
         /* Sidebar Buttons */
         .sidebar-btn { width: 100%; border: none; background-color: transparent; border-radius: 8px; font-size: 18px; margin-bottom: 5px; font-weight: 400; letter-spacing: 0.25px; text-align: left; cursor: pointer; padding: 14px; transition: background 0.25s; color: #3b221e; }
         .sidebar-btn:hover { background-color: rgba(214, 33, 26, 0.1); }
-        
-        /* THIS IS THE KEY TO FIXING YOUR COLOR ISSUE */
-        .sidebar-btn.active {
-            background-color: #d6211a !important;
-            color: white !important;
-        }
+        .sidebar-btn.active { background-color: #d6211a !important; color: white !important; }
 
         .deleteBtn, .editBtn { width: 100%; border: none; border-radius: 8px; background-color: #f8e8e4; padding: 8px; cursor: pointer; transition: background 0.25s; }
         .deleteBtn:hover, .editBtn:hover { background-color: #d6211a; color: white; }
+        .password-hidden { filter: blur(5px); user-select: none; cursor: pointer; transition: filter 0.3s ease; }
+        .password-visible { filter: blur(0); cursor: pointer; }
     </style>
 </head>
 
@@ -107,8 +104,7 @@
             <hr class="twoSolid">
             <table id="table">
                 <thead>
-                    <tr>
-                        </tr>
+                    <tr></tr>
                 </thead>
                 <tbody>
                     <tr><td>Loading...</td></tr>
@@ -339,27 +335,31 @@
 
     async function editItem(type, id) {
         const userId = localStorage.getItem('currentUser');
-        const response = await fetch(`/${type}?userId=${userId}`);
-        const data = await response.json();
-        
-        // Find item
-        const item = data.find(i => (type === 'passwords' ? i.number : i.idNumber) === id);
-        if (!item) return;
-
-        // Get Translations
+        const masterPassword = localStorage.getItem('masterPassword'); // 1. Get the key
         const lang = document.getElementById('langSelector').value;
         const t = dictionary[lang];
 
+        // 2. Update fetch to include masterPassword so you can see the decrypted password while editing
+        let fetchUrl = `/${type}?userId=${userId}`;
+        if (type === 'passwords') {
+            fetchUrl += `&masterPassword=${encodeURIComponent(masterPassword)}`;
+        }
+
+        const response = await fetch(fetchUrl);
+        const data = await response.json();
+    
+        const item = data.find(i => (type === 'passwords' ? i.number : i.idNumber) === id);
+        if (!item) return;
+
         let htmlContent = "";
-        
         if (type === 'passwords') {
             htmlContent = buildInputHtml(t.lblWebsite, item.website, "edit1") +
-                          buildInputHtml(t.lblUser, item.username, "edit2") +
-                          buildInputHtml(t.lblPass, item.encPassword, "edit3");
+                        buildInputHtml(t.lblUser, item.username, "edit2") +
+                        buildInputHtml(t.lblPass, item.encPassword, "edit3");
         } else {
             htmlContent = buildInputHtml(t.lblName, item.contactName, "edit1") +
-                          buildInputHtml(t.lblEmail, item.contactEmail, "edit2") +
-                          buildInputHtml(t.lblPhone, item.contactNumber, "edit3");
+                        buildInputHtml(t.lblEmail, item.contactEmail, "edit2") +
+                        buildInputHtml(t.lblPhone, item.contactNumber, "edit3");
         }
 
         showPopupMessage(t.edit, htmlContent, async () => {
@@ -367,8 +367,9 @@
             const v2 = document.getElementById('edit2').value;
             const v3 = document.getElementById('edit3').value;
 
+        // 3. Include masterPassword in the PUT body for encryption
             const body = type === 'passwords' 
-                ? {website: v1, username: v2, password: v3} 
+                ? {website: v1, username: v2, password: v3, masterPassword: masterPassword} 
                 : {name: v1, email: v2, phone: v3};
 
             await fetch(`/edit${type.charAt(0).toUpperCase() + type.slice(1)}/${id}`, {
@@ -406,34 +407,66 @@
         document.getElementById("popupMessage").style.display = 'none';
     }
 
-    async function loadDataFromServer(type) {
-        try {
-            const tbody = document.querySelector("#table tbody");
-            const userId = localStorage.getItem('currentUser');
-            // Assuming your backend handles /passwords and /contacts
-            const response = await fetch(`/${type}?userId=${userId}`);
-            const data = await response.json(); 
-            tbody.innerHTML = "";
-
-            data.forEach(item => {
-                const tr = document.createElement("tr");
-                if (type === 'passwords') {
-                    tr.innerHTML = `
-                        <td>${item.number}</td><td>${item.website}</td><td>${item.username}</td><td>${item.encPassword}</td>
-                        <td><button class="editBtn" onclick="editItem('passwords', ${item.number})">${svgEdit()}</button></td>
-                        <td><button class="deleteBtn" onclick="deleteItem('passwords', ${item.number})">${svgDelete()}</button></td>`;
-                } else {
-                    tr.innerHTML = `
-                        <td>${item.idNumber}</td><td>${item.contactName}</td><td>${item.contactEmail}</td><td>${item.contactNumber}</td>
-                        <td><button class="editBtn" onclick="editItem('contacts', ${item.idNumber})">${svgEdit()}</button></td>
-                        <td><button class="deleteBtn" onclick="deleteItem('contacts', ${item.idNumber})">${svgDelete()}</button></td>`;
-                }
-                tbody.appendChild(tr);
-            });
-        } catch (error) {
-            console.error("Error loading data", error);
+    function togglePassword(id) {
+        const passSpan = document.getElementById(`pass-${id}`);
+        if (passSpan.classList.contains('password-hidden')) {
+            passSpan.classList.remove('password-hidden');
+            passSpan.classList.add('password-visible');
+        } else {
+            passSpan.classList.remove('password-visible');
+            passSpan.classList.add('password-hidden');
         }
     }
+
+    async function loadDataFromServer(type) {
+    try {
+        const tbody = document.querySelector("#table tbody");
+        const userId = localStorage.getItem('currentUser');
+        
+        // 1. Build the URL. If it's passwords, add the masterPassword parameter.
+        let url = `/${type}?userId=${userId}`;
+        
+        if (type === 'passwords') {
+            const masterPassword = localStorage.getItem('masterPassword');
+            if (!masterPassword) {
+                alert("Session error: Master Password missing. Please log in again.");
+                window.location.href = "/login.html";
+                return;
+            }
+            url += `&masterPassword=${encodeURIComponent(masterPassword)}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json(); 
+        tbody.innerHTML = "";
+
+        data.forEach(item => {
+            const tr = document.createElement("tr");
+            if (type === 'passwords') {
+                tr.innerHTML = `
+                    <td>${item.number}</td>
+                    <td>${item.website}</td>
+                    <td>${item.username}</td>
+                    <td>
+                        <span id="pass-${item.number}" class="password-hidden" onclick="togglePassword(${item.number})">
+                            ${item.encPassword}
+                        </span>
+                    </td>
+                    <td><button class="editBtn" onclick="editItem('passwords', ${item.number})">${svgEdit()}</button></td>
+                    <td><button class="deleteBtn" onclick="deleteItem('passwords', ${item.number})">${svgDelete()}</button></td>`;
+            } else {
+                // ... your existing contact logic ...
+                tr.innerHTML = `
+                    <td>${item.idNumber}</td><td>${item.contactName}</td><td>${item.contactEmail}</td><td>${item.contactNumber}</td>
+                    <td><button class="editBtn" onclick="editItem('contacts', ${item.idNumber})">${svgEdit()}</button></td>
+                    <td><button class="deleteBtn" onclick="deleteItem('contacts', ${item.idNumber})">${svgDelete()}</button></td>`;
+            }
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error("Error loading data", error);
+    }
+}
 
     document.getElementById('searchWeb').addEventListener('keyup', function() {
         const filter = this.value.toUpperCase();
