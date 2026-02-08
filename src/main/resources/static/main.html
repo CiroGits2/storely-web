@@ -394,7 +394,6 @@
     function showPopupMessage(title, content, yesAction) {
         document.getElementById("popupMessage").style.display = "flex";
         document.getElementById("popupTitle").innerText = title;
-        // Use innerHTML so inputs work
         document.getElementById("popupText").innerHTML = content; 
 
         document.getElementById("yesBtn").onclick = function() {
@@ -423,14 +422,13 @@
         const tbody = document.querySelector("#table tbody");
         const userId = localStorage.getItem('currentUser');
         
-        // 1. Build the URL. If it's passwords, add the masterPassword parameter.
         let url = `/${type}?userId=${userId}`;
         
         if (type === 'passwords') {
-            const masterPassword = localStorage.getItem('masterPassword');
+            const masterPassword = localStorage.getItem('masterPass');
             if (!masterPassword) {
                 alert("Session error: Master Password missing. Please log in again.");
-                window.location.href = "/login.html";
+                window.location.href = "/index.html";
                 return;
             }
             url += `&masterPassword=${encodeURIComponent(masterPassword)}`;
@@ -455,7 +453,6 @@
                     <td><button class="editBtn" onclick="editItem('passwords', ${item.number})">${svgEdit()}</button></td>
                     <td><button class="deleteBtn" onclick="deleteItem('passwords', ${item.number})">${svgDelete()}</button></td>`;
             } else {
-                // ... your existing contact logic ...
                 tr.innerHTML = `
                     <td>${item.idNumber}</td><td>${item.contactName}</td><td>${item.contactEmail}</td><td>${item.contactNumber}</td>
                     <td><button class="editBtn" onclick="editItem('contacts', ${item.idNumber})">${svgEdit()}</button></td>
