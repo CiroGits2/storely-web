@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 public class SignUpController {
 
-    private BCryptPasswordEncoder enc = new BCryptPasswordEncoder(20);
+    private BCryptPasswordEncoder enc = new BCryptPasswordEncoder(12);
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SigninRequest request) {
