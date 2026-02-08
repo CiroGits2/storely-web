@@ -67,7 +67,7 @@
                 <button id="loginBtn" onclick="window.location.href='/index.html'">Log in</button>
             </div>
 
-            <button id="signinBtn" onclick="handleSignin()">Sign in</button>
+            <button id="signinBtn" onclick="handleSignin()">Sign up</button>
         </div>
     <script>
         async function handleSignin() {
@@ -124,7 +124,7 @@
             document.getElementById('confirmLabel').innerText = isSpan ? "Confirme su Contraseña Maestra" : "Confirm your Master Password";
             document.getElementById('account?Label').innerText = isSpan ? "Ya tiene una cuenta?" : "Already have an account?";
             document.getElementById('loginBtn').innerText = isSpan ? "Acceder" : "Log in";
-            document.getElementById('signinBtn').innerText = isSpan ? "Registrarse" : "Sign in";
+            document.getElementById('signinBtn').innerText = isSpan ? "Registrarse" : "Sign up";
             document.getElementById('userInput').placeholder = isSpan ? "ej. John Smith" : "ex. John Smith";
             document.getElementById('passwordInput').placeholder = isSpan ? "Contraseña Maestra" : "Master Password";
             document.getElementById('confirmInput').placeholder = isSpan ? "Confirmar Contraseña " : "Confirm Password";
