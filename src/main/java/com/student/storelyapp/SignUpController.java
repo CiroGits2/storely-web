@@ -38,7 +38,6 @@ public class SignUpController {
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
-
             //Inset row into table
             String sql = "INSERT INTO Users (username, masterPassword)" + 
                 "VALUES (?, ?)";
