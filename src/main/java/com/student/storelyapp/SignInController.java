@@ -6,14 +6,18 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@RestController
-public class SignInController {
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody SigninRequest request) {
+@RestController
+public class SignUpController {
+
+    private BCryptPasswordEncoder enc = new BCryptPasswordEncoder(20);
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SigninRequest request) {
         
         User user = addUser(request.username, request.password);
 
@@ -34,13 +38,14 @@ public class SignInController {
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
+
             //Inset row into table
             String sql = "INSERT INTO Users (username, masterPassword)" + 
                 "VALUES (?, ?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, username);
-            ps.setString(2, masterPassword); 
+            ps.setString(2, enc.encode(masterPassword)); 
 
             int addedRows = ps.executeUpdate();
 
