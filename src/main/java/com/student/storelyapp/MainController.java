@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,17 +19,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
-
 @RestController
 public class MainController {
+    //*  Encryption  *//
+    private BCryptPasswordEncoder enc = new BCryptPasswordEncoder(20);
 
     final String DB_URL = "jdbc:mysql://" + System.getenv("MYSQLHOST") + ":" + System.getenv("MYSQLPORT") + "/" + System.getenv("MYSQLDATABASE");
     final String USERNAME = System.getenv("MYSQLUSER");
     final String PASSWORD = System.getenv("MYSQLPASSWORD");
 
     @GetMapping("/passwords")
-    public ResponseEntity<List<Password>> getPasswords(@RequestParam int userId) throws SQLException {
+    public ResponseEntity<List<Password>> getPasswords(@RequestParam int userId, @RequestParam String masterPassword) throws SQLException {
         List<Password> list = new ArrayList<>();
         String sql = "SELECT * FROM passwords WHERE user_id = ?";
 
@@ -44,6 +45,7 @@ public class MainController {
                 password.website = rs.getString("Website"); 
                 password.username = rs.getString("Username");
                 password.encPassword = rs.getString("Password");
+
                 list.add(password);
             }
             return ResponseEntity.ok(list);
@@ -85,7 +87,7 @@ public class MainController {
 
     @PostMapping("/addPasswords{id}")
     public ResponseEntity<?> addNewPassword(@RequestBody PasswordRequest request, @RequestParam int userId) {
-
+        
         Password password = addPassword(request.website, request.username, request.password, userId);
 
         if (password != null) {
@@ -107,7 +109,7 @@ public class MainController {
 
             ps.setString(1, website);
             ps.setString(2, username);
-            ps.setString(3, encPassword);
+            ps.setString(3, enc.encode(encPassword));
             ps.setInt(4, user_id);
                 
             int addedRows = ps.executeUpdate();
@@ -127,6 +129,7 @@ public class MainController {
     @PutMapping("/editPasswords/{id}")
     public ResponseEntity<?> editPasswords(@PathVariable int id, @RequestBody PasswordRequest request) {
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
+
             String sql = "UPDATE passwords SET Website = ?, Username = ?, Password = ? WHERE number = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, request.website);
@@ -252,4 +255,3 @@ public class MainController {
         public String phone;
     }
 }
-    
