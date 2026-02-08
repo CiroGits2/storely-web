@@ -108,6 +108,10 @@ public class MainController {
     @PostMapping("/addPasswords{id}")
     public ResponseEntity<?> addNewPassword(@RequestBody PasswordRequest request, @RequestParam int userId) {
         
+        if (request.masterPassword == null || request.masterPassword.isEmpty()) {
+            return ResponseEntity.status(400).body("Master Password is required for encryption.");
+        }
+        
         Password password = addPassword(request.website, request.username, request.password, userId, request.masterPassword);
 
         if (password != null) {
