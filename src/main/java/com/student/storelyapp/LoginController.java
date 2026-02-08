@@ -6,28 +6,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LoginController {
+     //*  Encryption  *//
+    private BCryptPasswordEncoder enc = new BCryptPasswordEncoder(12);
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
             
-    User user = authenticateUser(request.username, request.password);
+    User user = authenticateUser(request.username);
         
         if (user != null) {
-            // Success
-            return ResponseEntity.ok(user);
+            boolean match = enc.matches(request.password, user.masterPassword);
+            if (match == true) {
+                // Success
+                return ResponseEntity.ok(user);
+            }
         } else {
             // Failure
             return ResponseEntity.status(401).body("Invalid credentials");
         }
+        return null;
     }
     
-    private User authenticateUser(String username, String password) {
+    private User authenticateUser(String username) {
 
         final String DB_URL = "jdbc:mysql://" + System.getenv("MYSQLHOST") + ":" + System.getenv("MYSQLPORT") + "/" + System.getenv("MYSQLDATABASE");
         final String USERNAME = System.getenv("MYSQLUSER");
@@ -35,12 +42,11 @@ public class LoginController {
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
-            String sql = "SELECT * FROM Users WHERE username = ? AND masterPassword = ?";
+            String sql = "SELECT id, username, masterPassword FROM Users WHERE username = ?";
 
             PreparedStatement pStatement = conn.prepareStatement(sql);
 
             pStatement.setString(1, username);
-            pStatement.setString(2, password);
             ResultSet rs = pStatement.executeQuery();
 
             if (rs.next()) {
@@ -57,6 +63,5 @@ public class LoginController {
     public static class LoginRequest {
         public String username;
         public String password;
-    }
-     
+    }  
 }
