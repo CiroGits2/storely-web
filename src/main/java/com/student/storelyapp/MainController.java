@@ -6,10 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +25,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 public class MainController {
     //*  Encryption  *//
-    private BCryptPasswordEncoder enc = new BCryptPasswordEncoder(20);
+    private String manageEncryption(String input, String key, int mode) throws Exception {
+        byte[] keyBytes = new byte[16];
+        byte[] originalKeyBytes = key.getBytes("UTF-8");
+        System.arraycopy(originalKeyBytes, 0, keyBytes, 0, Math.min(originalKeyBytes.length, 16));
+    
+        SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(mode, secretKey);
+
+        if (mode == Cipher.ENCRYPT_MODE) {
+            return Base64.getEncoder().encodeToString(cipher.doFinal(input.getBytes("UTF-8")));
+        } else {
+            return new String(cipher.doFinal(Base64.getDecoder().decode(input)));
+        }
+    }
 
     final String DB_URL = "jdbc:mysql://" + System.getenv("MYSQLHOST") + ":" + System.getenv("MYSQLPORT") + "/" + System.getenv("MYSQLDATABASE");
     final String USERNAME = System.getenv("MYSQLUSER");
@@ -34,6 +51,7 @@ public class MainController {
         String sql = "SELECT * FROM passwords WHERE user_id = ?";
 
         try(Connection con = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
+
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, userId);
 
@@ -44,8 +62,10 @@ public class MainController {
                 password.number = rs.getInt("Number");
                 password.website = rs.getString("Website"); 
                 password.username = rs.getString("Username");
-                password.encPassword = rs.getString("Password");
+                String encPass = rs.getString("Password");
 
+                password.encPassword = manageEncryption(encPass, masterPassword, Cipher.DECRYPT_MODE);
+                
                 list.add(password);
             }
             return ResponseEntity.ok(list);
@@ -88,28 +108,36 @@ public class MainController {
     @PostMapping("/addPasswords{id}")
     public ResponseEntity<?> addNewPassword(@RequestBody PasswordRequest request, @RequestParam int userId) {
         
-        Password password = addPassword(request.website, request.username, request.password, userId);
+        Password password = addPassword(request.website, request.username, request.password, userId, request.masterPassword);
 
         if (password != null) {
             // Success
             return ResponseEntity.ok(password);
         } else {
             // Failure
-            return null;
+            return ResponseEntity.status(500).body("Failed to encrypt or save password.");
         }
     }
 
-    private Password addPassword(String website, String username, String encPassword, int user_id) {
+    private Password addPassword(String website, String username, String commonPassword, int user_id, String masterPassword) {
             
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
             String sql = "INSERT INTO passwords (Website, Username, Password, user_id) VALUES (?, ?, ?, ?)";
 
+            String encValue;
+            try {
+                encValue = manageEncryption(commonPassword, masterPassword, Cipher.ENCRYPT_MODE);
+            } catch (Exception e) {
+                System.err.println("Encryption failed: " + e.getMessage());
+                return null;
+            }
+            
             PreparedStatement ps = conn.prepareStatement(sql);
 
             ps.setString(1, website);
             ps.setString(2, username);
-            ps.setString(3, enc.encode(encPassword));
+            ps.setString(3, encValue);
             ps.setInt(4, user_id);
                 
             int addedRows = ps.executeUpdate();
@@ -118,7 +146,7 @@ public class MainController {
                 Password password = new Password();
                 password.website = website;
                 password.username = username;
-                password.encPassword = encPassword;
+                password.encPassword = commonPassword;
                 password.user_id = user_id;
                 return password;
             }
@@ -130,11 +158,18 @@ public class MainController {
     public ResponseEntity<?> editPasswords(@PathVariable int id, @RequestBody PasswordRequest request) {
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
 
-            String sql = "UPDATE passwords SET Website = ?, Username = ?, Password = ? WHERE number = ?";
+            String encValue;
+            try {
+                encValue = manageEncryption(request.password, request.masterPassword, Cipher.ENCRYPT_MODE);
+            } catch (Exception e) {
+                return ResponseEntity.status(500).body("Encryption failed: " + e.getMessage());
+            }
+
+            String sql = "UPDATE passwords SET Website = ?, Username = ?, Password = ? WHERE Number = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, request.website);
             ps.setString(2, request.username);
-            ps.setString(3, request.password);
+            ps.setString(3, encValue);
             ps.setInt(4, id);
             ps.executeUpdate();
             return ResponseEntity.ok().build();
@@ -210,7 +245,7 @@ public class MainController {
     @PutMapping("/editContacts/{id}")
     public ResponseEntity<?> editContacts(@PathVariable int id, @RequestBody ContactRequest request) {
         try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
-            String sql = "UPDATE contacts SET Name = ?, Email = ?, phoneNumber = ? WHERE number = ?";
+            String sql = "UPDATE contacts SET Name = ?, Email = ?, phoneNumber = ? WHERE Number = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, request.name);
             ps.setString(2, request.email);
@@ -247,6 +282,7 @@ public class MainController {
         public String website;
         public String username;
         public String password;
+        public String masterPassword;
     } 
 
     public static class ContactRequest {
