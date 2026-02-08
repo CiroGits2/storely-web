@@ -167,7 +167,7 @@
 
         <div class="row">
             <span id="account?Label">Don't have an account?</span>
-            <button id="signinBtn" onclick="window.location.href='/signin.html'">Sign in</button>
+            <button id="signinBtn" onclick="window.location.href='/signup.html'">Sign up</button>
         </div>
         
         <button id="loginBtn" onclick="handleLogin()">Log in</button>
@@ -209,7 +209,7 @@
         document.getElementById('passLabel').innerText = isSpan ? "Contraseña Maestra:" : "Master Password:";
         document.getElementById('account?Label').innerText = isSpan ? "No tiene una cuenta?" : "Don't have an account?";
         document.getElementById('loginBtn').innerText = isSpan ? "Acceder" : "Log in";
-        document.getElementById('signinBtn').innerText = isSpan ? "Registrarse" : "Sign in";
+        document.getElementById('signinBtn').innerText = isSpan ? "Registrarse" : "Sign up";
         document.getElementById('userField').placeholder = isSpan ? "Nombre de Usuario" : "Enter Username";
         document.getElementById('passwordField').placeholder = isSpan ? "Contraseña Maestra" : "Enter Master Password";
     }
