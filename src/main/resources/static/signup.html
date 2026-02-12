@@ -16,7 +16,7 @@
         input { width: 100%; padding: 12px 16px; border: 1px solid #e1cfcb; border-radius: 8px; font-size: 16px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; transition: all 0.25s; }
         input:focus { outline: none; border-color: #fb4f49; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         h1 { font-size: 28px; font-weight: 700; color: #3b221e; margin: 0 0 8px 0; }
-        .success { font-size: 0.875rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .success { color: limegreen; font-size: 0.875rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .error { color: #d6211a; font-size: 0.875rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
 
         .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 20px; }
@@ -58,7 +58,7 @@
 
             <div class="form">
                 <label id="confirmLabel">Confirm your Password</label>
-                <input type="text" id="confirmInput" placeholder="Confirm Password" required>
+                <input type="text" id="confirmInput" oninput="updateSpan()" placeholder="Confirm Password" required>
                 <span id="passwordError" class="error"></span>
             </div>
 
@@ -70,24 +70,39 @@
             <button id="signinBtn" onclick="handleSignin()">Sign up</button>
         </div>
     <script>
+        function updateSpan() {
+            const username = document.getElementById("userInput").value;
+            const password = document.getElementById('passwordInput').value;
+            const statusText = document.getElementById('passwordError');
+            const confirm = document.getElementById('confirmInput').value
+            const lang = document.getElementById('langSelector').value;
+
+            if(password !== confirm) {
+                statusText.textContent = lang == "English" 
+                    ? "Passwords dont' match. Try again" 
+                    : "Contraseñas no coinciden. Intente de nuevo";
+                statusText.classList.remove('success')
+                statusText.classList.add('error');
+                return;
+            } else {
+                statusText.textContent = lang == "English" 
+                    ? "Passwords match!" 
+                    : "Contraseñas coinciden!";
+                statusText.classList.remove('error')
+                statusText.classList.add('success');
+            }
+        }
+        
         async function handleSignin() {
             const username = document.getElementById("userInput").value;
             const password = document.getElementById('passwordInput').value;
             const confirm = document.getElementById('confirmInput').value
-            const statusText = document.getElementById('passwordError');
             const lang = document.getElementById('langSelector').value;
 
             let valid = true;
 
             if (!username || !password || !confirm) {
                 alert(lang == "English" ? "Please fill in all fields." : "Porfavor escriba en todos los textos");
-                return;
-            }
-
-            if(password !== confirm) {
-                statusText.textContent = lang == "English" ? "Passwords dont' match" : "Contraseñas no coinciden";
-                statusText.classList.remove('success')
-                statusText.classList.add('error');
                 return;
             }
 
