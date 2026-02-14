@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Storely - Login</title>
-    <link rel="icon" type="image/x-icon" href="storely-logo-img.png">
+    <link rel="icon" type="image/x-icon" href="storely-logo-img-favicon.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -143,7 +143,7 @@
 
     <div class="lang-container">
         <label id="langLabel" style="display:inline; margin-right:5px;">Language:</label>
-        <select id="langSelector" onchange="changeLanguage()">
+        <select id="langSelector" onchange="applyTranslations()">
             <option value="English">English</option>
             <option value="Español">Español</option>
         </select>
@@ -179,6 +179,11 @@
         const password = document.getElementById('passwordField').value;
         const lang = document.getElementById('langSelector').value;
 
+        if (!username || !password) {
+            alert(lang == "English" ? "Please fill in all fields." : "Porfavor escriba en todos los textos");
+            return;
+        }
+
         const response = await fetch('/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -187,7 +192,7 @@
 
         if (response.ok) {
             const user = await response.json();
-            alert(lang === "English" ? "Welcome " + user.username + "!": "Bienvenido/a " + user.username + "!");
+            alert(lang === "English" ? "Password correct! Welcome " + user.username + "!": "Contraseña correcta! Bienvenido/a " + user.username + "!");
             localStorage.setItem('currentUser', user.id);
             localStorage.setItem('masterPass', password)
             window.location.href = "/main.html"; // HTML Main Frame
@@ -199,20 +204,49 @@
         }
     }
 
-    function changeLanguage() {
+    const dictionary = {
+        English: { 
+            langLabel: "Language:",
+            welcome: "Welcome Back to Storely",
+            sub: "Securely store your passwords and contacts",
+            username: "User Name",
+            password: "Master Password",
+            confirm: "Confirm your Password",
+            noAccount: "Don't have an account?",
+            signup: "Sign Up",
+            login: "Log in",
+            inputUser: "Enter Username",
+            inputPass: "Enter Master Password"
+        },
+        Español: {
+            langLabel: "Idioma:",
+            welcome: "Bienvenido/a Devuelta a Storely",
+            sub: "Gaurde sus contraseñas y contactos con seguridad",
+            username: "Nombre Usuario",
+            password: "Contraseña Maestra",
+            confirm: "Confirm your Password",
+            noAccount: "No tiene una cuenta?",
+            signup: "Registrarse",
+            login: "Acceder",
+            inputUser: "Nombre de Usuario",
+            inputPass: "Contraseña Maestra"
+        }
+    };
+
+    function applyTranslations() {
         const lang = document.getElementById('langSelector').value;
-        const isSpan = lang === "Español";
+        const t = dictionary[lang];
     
-        document.getElementById('loginHeader').innerText = isSpan ? "Bienvenido/a Devuelta a Storely" : "Welcome Back to Storely";
-        document.getElementById('subText').innerText = isSpan ? "Gaurde sus contraseñas y contactos con seguridad" : "Securely store your passwords and contacts!";
-        document.getElementById('langLabel').innerText = isSpan ? "Idioma:" : "Language:";
-        document.getElementById('userLabel').innerText = isSpan ? "Nombre Usuario:" : "User Name:";
-        document.getElementById('passLabel').innerText = isSpan ? "Contraseña Maestra:" : "Master Password:";
-        document.getElementById('account?Label').innerText = isSpan ? "No tiene una cuenta?" : "Don't have an account?";
-        document.getElementById('loginBtn').innerText = isSpan ? "Acceder" : "Log in";
-        document.getElementById('signinBtn').innerText = isSpan ? "Registrarse" : "Sign up";
-        document.getElementById('userField').placeholder = isSpan ? "Nombre de Usuario" : "Enter Username";
-        document.getElementById('passwordField').placeholder = isSpan ? "Contraseña Maestra" : "Enter Master Password";
+        document.getElementById('loginHeader').innerText = t.welcome;
+        document.getElementById('subText').innerText = t.sub;
+        document.getElementById('langLabel').innerText = t.username;
+        document.getElementById('userLabel').innerText = t.password;
+        document.getElementById('passLabel').innerText = t.confirm;
+        document.getElementById('account?Label').innerText = t.noAccount;
+        document.getElementById('signinBtn').innerText = t.signup;
+        document.getElementById('loginBtn').innerText = t.login;
+        document.getElementById('userField').placeholder = t.inputUser;
+        document.getElementById('passwordField').placeholder = t.inputPass;
     }
 </script>
 </body>
