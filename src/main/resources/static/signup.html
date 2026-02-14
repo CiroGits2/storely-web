@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Storely - Signup</title>
-    <link rel="icon" type="image/x-icon" href="storely-logo-img.png">
+    <link rel="icon" type="image/x-icon" href="storely-logo-img-favicon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
     <body>
         <div class="lang-container">
             <label id="langLabel" style="display:inline; margin-right:5px;">Language:</label>
-            <select id="langSelector" onchange="changeLanguage()">
+            <select id="langSelector" onchange="applyTranslations()">
                 <option value="English">English</option>
                 <option value="Español">Español</option>
             </select>
@@ -70,11 +70,42 @@
             <button id="signinBtn" onclick="handleSignin()">Sign up</button>
         </div>
     <script>
+        const dictionary = {
+            English: { 
+                langLabel: "Language:",
+                createAccount: "Create your Account",
+                subText: "Write your information below",
+                username: "Create your Username",
+                password: "Create your Master Password",
+                confirm: "Confirm your Password",
+                account: "Already have an account?",
+                login: "Log in",
+                signup: "Sign Up",
+                inputUser: "ex. John Smith",
+                inputPass: "Master Password",
+                inputConfirm: "Confirm Password"
+            },
+            Español: {
+                langLabel: "Idioma:",
+                createAccount: "Cree su Cuenta",
+                subText: "Escriba su informacion abajo",
+                username: "Cree su Nombre de Usuario",
+                password: "Cree su Contraseña Maestra" ,
+                confirm: "Confirme su Contraseña Maestra",
+                account: "Ya tiene una cuenta?",
+                login: "Acceder",
+                signup: "Registrarse",
+                inputUser: "ej. John Smith",
+                inputPass: "Contraseña Maestra",
+                inputConfirm: "Confirmar Contraseña"
+            }
+        };
+
         function updateSpan() {
             const username = document.getElementById("userInput").value;
             const password = document.getElementById('passwordInput').value;
+            const confirm = document.getElementById('confirmInput').value;
             const statusText = document.getElementById('passwordError');
-            const confirm = document.getElementById('confirmInput').value
             const lang = document.getElementById('langSelector').value;
 
             if(password !== confirm) {
@@ -92,14 +123,12 @@
                 statusText.classList.add('success');
             }
         }
-        
+
         async function handleSignin() {
             const username = document.getElementById("userInput").value;
             const password = document.getElementById('passwordInput').value;
-            const confirm = document.getElementById('confirmInput').value
+            const confirm = document.getElementById('confirmInput').value;
             const lang = document.getElementById('langSelector').value;
-
-            let valid = true;
 
             if (!username || !password || !confirm) {
                 alert(lang == "English" ? "Please fill in all fields." : "Porfavor escriba en todos los textos");
@@ -127,22 +156,21 @@
             }
         }
 
-        function changeLanguage() {
+        function applyTranslations() {
             const lang = document.getElementById('langSelector').value;
-            const isSpan = lang === "Español";
-    
-            document.getElementById('signinHeader').innerText = isSpan ? "Cree su Cuenta" : "Create your Account";
-            document.getElementById('subText').innerText = isSpan ? "Escriba su informacion abajo" : "Write your information below";
-            document.getElementById('langLabel').innerText = isSpan ? "Idioma:" : "Language:";
-            document.getElementById('userLabel').innerText = isSpan ? "Cree su Nombre de Usuario" : "Create your User Name";
-            document.getElementById('passLabel').innerText = isSpan ? "Cree su Contraseña Maestra" : "Create your Master Password";
-            document.getElementById('confirmLabel').innerText = isSpan ? "Confirme su Contraseña Maestra" : "Confirm your Master Password";
-            document.getElementById('account?Label').innerText = isSpan ? "Ya tiene una cuenta?" : "Already have an account?";
-            document.getElementById('loginBtn').innerText = isSpan ? "Acceder" : "Log in";
-            document.getElementById('signinBtn').innerText = isSpan ? "Registrarse" : "Sign in";
-            document.getElementById('userInput').placeholder = isSpan ? "ej. John Smith" : "ex. John Smith";
-            document.getElementById('passwordInput').placeholder = isSpan ? "Contraseña Maestra" : "Master Password";
-            document.getElementById('confirmInput').placeholder = isSpan ? "Confirmar Contraseña " : "Confirm Password";
+            const t = dictionary[lang];
+
+            document.getElementById('langLabel').innerText = t.langLabel;
+            document.getElementById('signinHeader').innerText = t.createAccount;
+            document.getElementById('subText').innerText = t.subText;
+            document.getElementById('passLabel').innerText = t.username;
+            document.getElementById('confirmLabel').innerText = t.password;
+            document.getElementById('account?Label').innerText = t.account;
+            document.getElementById('loginBtn').innerText = t.login;
+            document.getElementById('signinBtn').innerText = t.signup;
+            document.getElementById('userInput').placeholder = t.inputUser;
+            document.getElementById('passwordInput').placeholder = t.inputPass;
+            document.getElementById('confirmInput').placeholder = t.inputConfirm;
         }
     </script>
     </body>
