@@ -139,6 +139,11 @@
                 return;
             }
 
+            if (password !== confirm) {
+                alert(lang == "English" ? "Passwords don't match!" : "Contraseñas no coinciden!");
+                return;
+            }
+
             const response = await fetch('/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -167,8 +172,9 @@
             document.getElementById('langLabel').innerText = t.langLabel;
             document.getElementById('signinHeader').innerText = t.createAccount;
             document.getElementById('subText').innerText = t.subText;
-            document.getElementById('passLabel').innerText = t.username;
-            document.getElementById('confirmLabel').innerText = t.password;
+            document.getElementById('userLabel').innerText = t.username;
+            document.getElementById('passLabel').innerText = t.password;
+            document.getElementById('confirmLabel').innerText = t.confirm;
             document.getElementById('account?Label').innerText = t.account;
             document.getElementById('loginBtn').innerText = t.login;
             document.getElementById('signinBtn').innerText = t.signup;
