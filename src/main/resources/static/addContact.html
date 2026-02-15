@@ -163,13 +163,6 @@
                 body: JSON.stringify({name: name, email: email, phone: phone})
             });
 
-            if (response.ok) {
-                alert(lang == "English" ? "Contact Added!" : "Contacto Añadido!");
-                window.location.href = "/main.html";
-            } else {
-                alert(lang == "English" ? "Failed to add Contact" : "Fallo en Añadir el Contacto");
-            }
-
             if (!name) {
                 alert(lang == "English" ? "Please enter a valid name." : "Porfavor escriba un nombre valido");
             }
@@ -177,6 +170,13 @@
             if (!name && !email && !phone) {
                 alert(lang == "English" ? "Please fill in at least one field." : "Porfavor escriba almenos en un texto");
                 return;
+            }
+
+            if (response.ok) {
+                alert(lang == "English" ? "Contact Added!" : "Contacto Añadido!");
+                window.location.href = "/main.html";
+            } else {
+                alert(lang == "English" ? "Failed to add Contact" : "Fallo en Añadir el Contacto");
             }
         }
 
