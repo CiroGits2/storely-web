@@ -157,12 +157,6 @@
             const lang = document.getElementById('langSelector').value;
             const userId = localStorage.getItem('currentUser');
 
-            const response = await fetch(`/addContacts?userId=${userId}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({name: name, email: email, phone: phone})
-            });
-
             if (!name && !email && !phone) {
                 alert(lang == "English" ? "Please fill in at least one field." : "Porfavor escriba almenos en un texto");
                 return;
@@ -171,6 +165,12 @@
             if (!name) {
                 alert(lang == "English" ? "Please enter a valid name." : "Porfavor escriba un nombre valido");
             }
+            
+            const response = await fetch(`/addContacts?userId=${userId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({name: name, email: email, phone: phone})
+            });
 
             if (response.ok) {
                 alert(lang == "English" ? "Contact Added!" : "Contacto Añadido!");
