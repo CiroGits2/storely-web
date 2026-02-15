@@ -129,10 +129,10 @@
                 <button id="backBtn" onclick="window.location.href='/main.html'">Back</button>
             </div>
             <h2 id="addHeader">Add Contact</h2>
-            <p class="subtitle" id="subText">Write your information below</p>
+            <p class="subtitle" id="subText">Write yout information below (at least one field) </p>
 
             <div class="form">
-                <label id="nameLabel">Enter the contact's name</label>
+                <label id="nameLabel">Enter the contact's name (optional)</label>
                 <input type="text" id="nameInput" placeholder="ex. John Doe">
             </div>
 
@@ -161,10 +161,6 @@
                 alert(lang == "English" ? "Please fill in at least one field." : "Porfavor escriba almenos en un texto");
                 return;
             }
-
-            if (!name) {
-                alert(lang == "English" ? "Please enter a valid name." : "Porfavor escriba un nombre valido");
-            }
             
             const response = await fetch(`/addContacts?userId=${userId}`, {
                 method: 'POST',
@@ -186,9 +182,9 @@
     
             document.getElementById('backBtn').innerText = isSpan ? "Atras" : "Back";
             document.getElementById('addHeader').innerText = isSpan ? "Añadir Contacto" : "Add Contact";
-            document.getElementById('subText').innerText = isSpan ? "Escriba su informacion abajo" : "Write your information below";
+            document.getElementById('subText').innerText = isSpan ? "Escriba su informacion abajo (al menos un campo de texto)" : "Write your information below (at least one field)";
             document.getElementById('langLabel').innerText = isSpan ? "Idioma:" : "Language:";
-            document.getElementById('nameLabel').innerText = isSpan ? "Escriba el nombre del contacto:" : "Enter the contact's name";
+            document.getElementById('nameLabel').innerText = isSpan ? "Escriba el nombre del contacto (opcional):" : "Enter the contact's name (optional)";
             document.getElementById('emailLabel').innerText = isSpan ? "Escriba el correo electronico del contacto (opcional)" : "Enter the contact's e-mail (optional)";
             document.getElementById('numberLabel').innerText = isSpan ? "Esciba el numero de telefono del contacto (opcional):" : "Enter the contact's phone number (optional)";
             document.getElementById('addBtn').innerText = isSpan ? "Añadir +" : "Add +";
