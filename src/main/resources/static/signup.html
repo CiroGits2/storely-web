@@ -122,6 +122,10 @@
                 statusText.classList.remove('error')
                 statusText.classList.add('success');
             }
+
+            if (!confirm) {
+                statusText.textContent = "";
+            }
         }
 
         async function handleSignin() {
