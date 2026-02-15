@@ -211,7 +211,6 @@
             sub: "Securely store your passwords and contacts",
             username: "User Name",
             password: "Master Password",
-            confirm: "Confirm your Password",
             noAccount: "Don't have an account?",
             signup: "Sign Up",
             login: "Log in",
@@ -219,17 +218,16 @@
             inputPass: "Enter Master Password"
         },
         Español: {
-            langLabel: "Idioma:",
+            langlabel: "Idioma:",
             welcome: "Bienvenido/a Devuelta a Storely",
             sub: "Gaurde sus contraseñas y contactos con seguridad",
             username: "Nombre Usuario",
             password: "Contraseña Maestra",
-            confirm: "Confirm your Password",
             noAccount: "No tiene una cuenta?",
             signup: "Registrarse",
             login: "Acceder",
-            inputUser: "Nombre de Usuario",
-            inputPass: "Contraseña Maestra"
+            inputUser: "Escriba el Nombre de Usuario",
+            inputPass: "Escriba la Contraseña Maestra"
         }
     };
 
@@ -239,9 +237,9 @@
     
         document.getElementById('loginHeader').innerText = t.welcome;
         document.getElementById('subText').innerText = t.sub;
-        document.getElementById('langLabel').innerText = t.username;
-        document.getElementById('userLabel').innerText = t.password;
-        document.getElementById('passLabel').innerText = t.confirm;
+        document.getElementById('langLabel').innerText = t.langlabel;
+        document.getElementById('userLabel').innerText = t.username;
+        document.getElementById('passLabel').innerText = t.password;
         document.getElementById('account?Label').innerText = t.noAccount;
         document.getElementById('signinBtn').innerText = t.signup;
         document.getElementById('loginBtn').innerText = t.login;
