@@ -163,13 +163,13 @@
                 body: JSON.stringify({name: name, email: email, phone: phone})
             });
 
-            if (!name) {
-                alert(lang == "English" ? "Please enter a valid name." : "Porfavor escriba un nombre valido");
-            }
-
             if (!name && !email && !phone) {
                 alert(lang == "English" ? "Please fill in at least one field." : "Porfavor escriba almenos en un texto");
                 return;
+            }
+
+            if (!name) {
+                alert(lang == "English" ? "Please enter a valid name." : "Porfavor escriba un nombre valido");
             }
 
             if (response.ok) {
